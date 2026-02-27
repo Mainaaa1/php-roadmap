@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\WebPostController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PostController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/posts', [PostController::class, 'index']);
+Route::resource('posts', WebPostController::class)
+    ->except(['show'])
+    ->names('web.posts');
