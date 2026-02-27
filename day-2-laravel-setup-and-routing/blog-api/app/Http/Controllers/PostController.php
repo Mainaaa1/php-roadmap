@@ -2,70 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        public function index()
-{
-    $posts = Post::all();
-    return view('posts.index', compact('posts'));
-}
+        $posts = Post::latest()->get();
+
+        return response()->json($posts);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-       public function create()
-{
-    return view('posts.create');
-}
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+        ]);
+
+        $post = Post::create($validated);
+
+        return response()->json([
+            'message' => 'Post created successfully.',
+            'data' => $post,
+        ], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show(Post $post): JsonResponse
     {
-        //
+        return response()->json($post);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(Request $request, Post $post): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'title' => ['sometimes', 'required', 'string', 'max:255'],
+            'content' => ['sometimes', 'required', 'string'],
+        ]);
+
+        $post->update($validated);
+
+        return response()->json([
+            'message' => 'Post updated successfully.',
+            'data' => $post,
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy(Post $post): JsonResponse
     {
-        //
-    }
+        $post->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'message' => 'Post deleted successfully.',
+        ]);
     }
 }
